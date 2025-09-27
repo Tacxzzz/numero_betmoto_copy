@@ -1113,7 +1113,7 @@ export const getCommissions = async (
         withCredentials: true,
         headers: { "Content-Type": "application/json" }
       });
-
+    console.log(response);
     if (response.data) {
       if(response.data.authenticated)
       {
@@ -1840,6 +1840,25 @@ export const getUserType = async () => {
     }
   } catch (error) {
     console.error("Failed to fetch games:", error);
+    return [];
+  }
+};
+
+export const checkMinimumCashout = async (userID : string) => {
+  try {
+    const response = await axios.post(`${API_URL}/main/checkMinimumCashout`, {userID},{
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" }
+      });
+
+    if (!response.data.authenticated || !response.data.proceed) {
+      const message = response.data.message;
+      return { error: true, message };
+    } 
+
+    return response.data;
+
+  } catch (error) {
     return [];
   }
 };

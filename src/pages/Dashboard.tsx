@@ -27,7 +27,7 @@ import { FiCopy } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from "./UserContext";
-import { addBetClients, cashInCashko, cashOutCashko, cashOutCashkoCommission, convertCommissionsToBalance, convertWinsToBalance, fetchUserData, getBetClientData, getCommissions, getGames, getGamesToday, getMyBetClientsCount, getReferrals, updatePassword, checkMaintainingBalance, addLog, getMySavedBetsCount, getMyBetClients, getUserType } from '@/lib/apiCalls';
+import { addBetClients, cashInCashko, cashOutCashko, cashOutCashkoCommission, convertCommissionsToBalance, convertWinsToBalance, fetchUserData, getBetClientData, getCommissions, getGames, getGamesToday, getMyBetClientsCount, getReferrals, updatePassword, checkMaintainingBalance, addLog, getMySavedBetsCount, getMyBetClients, getUserType, checkMinimumCashout } from '@/lib/apiCalls';
 import { formatPeso } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -131,7 +131,7 @@ export function Dashboard({ onLogout }: SidebarProps) {
   const [showWinConvertDialog, setShowWinConvertDialog] = useState(false);
   const [showComConvertDialog, setShowComConvertDialog] = useState(false);
   const [showClientsDialog, setShowClientsDialog] = useState(false);
-
+  const [commissionMinimumCashout, setCommissionMinimumCashout] = useState(0);
   const [transLimit, setTransLimit] = useState(5000);
   const [commissionsCashout, setCommissionsCashout] = useState(0);
   const [cashInAmount, setCashInAmount] = useState(0);
@@ -236,6 +236,7 @@ export function Dashboard({ onLogout }: SidebarProps) {
         setLevel1Percent(data.level_one_percent);
         setLevel2Percent(data.level_two_percent);
         setNoLimitPercent(data.nolimit_percent);
+        setCommissionMinimumCashout(data.minimum_commission_cashout);
         setUserType(data.type);
         setLoading(false);
 
@@ -333,6 +334,7 @@ export function Dashboard({ onLogout }: SidebarProps) {
     setLevel2Percent(data.level_two_percent);
     setNoLimitPercent(data.nolimit_percent);
     setUserType(data.type);
+    setCommissionMinimumCashout(data.minimum_commission_cashout);
     setShowAccountModal(false);
 
     const totalSavedBets= await getMySavedBetsCount(userID);
@@ -383,6 +385,7 @@ export function Dashboard({ onLogout }: SidebarProps) {
         setLevel2Percent(data.level_two_percent);
         setNoLimitPercent(data.nolimit_percent);
         setUserType(data.type);
+        setCommissionMinimumCashout(data.minimum_commission_cashout);
 
         const totalSavedBets= await getMySavedBetsCount(userID);
         setSavedBetsCount(totalSavedBets.count);
@@ -513,6 +516,7 @@ const handleSubmit = async (e) => {
         setLevel2Percent(data.level_two_percent);
         setNoLimitPercent(data.nolimit_percent);
         setUserType(data.type);
+        setCommissionMinimumCashout(data.minimum_commission_cashout);
 
         const totalSavedBets= await getMySavedBetsCount(userID);
         setSavedBetsCount(totalSavedBets.count);
@@ -582,6 +586,7 @@ const handleSubmit = async (e) => {
         setLevel2Percent(data.level_two_percent);
         setNoLimitPercent(data.nolimit_percent);
         setUserType(data.type);
+        setCommissionMinimumCashout(data.minimum_commission_cashout);
 
         const totalSavedBets= await getMySavedBetsCount(userID);
         setSavedBetsCount(totalSavedBets.count);
@@ -649,6 +654,7 @@ const handleSubmit = async (e) => {
         setLevel2Percent(data.level_two_percent);
         setNoLimitPercent(data.nolimit_percent);
         setUserType(data.type);
+        setCommissionMinimumCashout(data.minimum_commission_cashout);
 
         const totalSavedBets= await getMySavedBetsCount(userID);
         setSavedBetsCount(totalSavedBets.count);
@@ -716,6 +722,7 @@ const handleSubmit = async (e) => {
         setLevel2Percent(data.level_two_percent);
         setNoLimitPercent(data.nolimit_percent);
         setUserType(data.type);
+        setCommissionMinimumCashout(data.minimum_commission_cashout);
 
         const totalSavedBets= await getMySavedBetsCount(userID);
         setSavedBetsCount(totalSavedBets.count);
@@ -751,6 +758,14 @@ const handleSubmit = async (e) => {
     if (sourceType == "winnings"){ 
       setShowCashOutDialog(true);
     } else {
+      const data = await checkMinimumCashout(userID);
+
+      if (!data.authenticated || !data.proceed)
+      {
+        alert(data.message);
+        return;
+      }
+
       setShowCashOutComDialog(true);
     }
   }
@@ -2208,8 +2223,7 @@ function AccountManagementModal({ onClose }: { onClose: () => void }, { onLogout
         const coordinator = userTypeData.find((u) => u.type === "coordinator");
 
         const encodedParams = btoa(`ref=${userID}&userType=${data.type}&key=${randomKey}`); // Encode full params
-        const employerEncodedParams = btoa(`ref=${userID}&userType=${data.type}&fromEmployer=yes&mobile=${mobile}&key=${randomKey}`);
-
+        const employerEncodedParams = btoa(`ref=${userID}&userType=${data.type}&fromEmployer=yes&mobile=${data.mobile}&key=${randomKey}`);
         setReferralLink(`${currentURL}/create-account?data=${encodedParams}`);
         setEmployerReferralLink(`${currentURL}/create-account?data=${employerEncodedParams}`);
 
@@ -2308,7 +2322,7 @@ const handleShare = () => {
                 <h3 className="font-bold mt-2">{mobile}</h3>
               </div>
               
-              {userType !== 'bettor' && (
+              {(userType !== 'bettor' || refLevel === "nolimit") && (
                 <div className="space-y-3">
                   <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2316,10 +2330,10 @@ const handleShare = () => {
                           {coordinator === null || usher === null || bettor === null
                             ? ""
                             : userType === "coordinator"
-                            ? Number(coordinator.bet_commission_percent) - Number(bettor.bet_commission_percent)
+                            ? 0
                             : userType === "usher"
-                            ? Number(usher.bet_commission_percent) - Number(usher.employer_commission_share) - Number(bettor.bet_commission_percent)
-                            : level1Percent} %)
+                            ? 0
+                            : noLimitPercent} %)
                       </label>
                       <div className="flex items-center">
                         <Input defaultValue={referralLink} disabled className="mr-2" />
@@ -2337,7 +2351,7 @@ const handleShare = () => {
                   }} className="w-full bg-blue-600 text-white">
                     Share QR
                   </Button>
-                  {employer === 'yes' && (
+                  {employer === 'yes' && userType === 'coordinator' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Referral Link for Usher ({coordinator === null ||  usher === null || bettor === null ? "" : usher.employer_commission_share} %)</label>
                       <div className="flex items-center">
@@ -2374,6 +2388,18 @@ const handleShare = () => {
                             
                           </div>
                       </div> */}
+                    </>
+                  )}
+
+                  {refLevel === 'nolimit' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">No. of Referred</label>
+                        <div className="flex items-center">
+                          <Input readOnly value={nolimit} disabled className="mr-2" />
+                          
+                        </div>
+                      </div>
                     </>
                   )}
                   
