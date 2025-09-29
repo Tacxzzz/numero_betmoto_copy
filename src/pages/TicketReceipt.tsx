@@ -156,9 +156,9 @@ const TicketReceipt: React.FC = () => {
       </header>
 
       {/* Ticket Card */}
-      <div ref={ticketRef}>
+      <div>
         {ticketData.map((bet, index) => (
-        <Card ref={index === 0 ? ticketRef : null} className="w-full max-w-sm shadow-lg mt-4">
+        <Card ref={ticketRef} className="w-full max-w-sm shadow-lg mt-4">
           <CardContent className="p-6 flex flex-col items-center">
             {/* Logo */}
             <div className="mb-6 mt-4">
