@@ -69,19 +69,25 @@ const TicketReceipt: React.FC = () => {
 
 
   const captureTicket = async () => {
-    if (!ticketRef.current || !html2canvas) {
-      console.error("Cannot capture ticket: Missing ref or html2canvas");
-      return null;
-    }
-    
-    try {
-      const canvas = await html2canvas(ticketRef.current);
-      return canvas.toDataURL("image/png");
-    } catch (error) {
-      console.error("Error capturing ticket:", error);
-      return null;
-    }
-  };
+  if (!ticketRef.current || !html2canvas) {
+    console.error("Cannot capture ticket: Missing ref or html2canvas");
+    return null;
+  }
+
+  try {
+    const canvas = await html2canvas(ticketRef.current, {
+      backgroundColor: null,
+      scale: 2,
+      scrollX: 0,
+      scrollY: 0,
+    });
+
+    return canvas.toDataURL("image/png");
+  } catch (error) {
+    console.error("Error capturing ticket:", error);
+    return null;
+  }
+};
 
   const handleShare = async () => {
     if (!isClient) return;
@@ -158,7 +164,7 @@ const TicketReceipt: React.FC = () => {
       {/* Ticket Card */}
       <div>
         {ticketData.map((bet, index) => (
-        <Card ref={ticketRef} className="w-full max-w-sm shadow-lg mt-4">
+        <Card ref={ticketRef} className="w-[365px] h-[430px] overflow-hidden">
           <CardContent className="p-6 flex flex-col items-center">
             {/* Logo */}
             <div className="mb-6 mt-4">
