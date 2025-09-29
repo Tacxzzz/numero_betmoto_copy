@@ -200,7 +200,7 @@ export function LoginPage() {
           </div> */}
         </div>
 
-        
+        <h2 className="text-2xl font-bold text-center mb-3 text-[#c63018]">PisoGamePlus</h2>
         
         {/* Login Form */}
         <div className="overflow-hidden">

@@ -146,6 +146,8 @@ export function CreatePage() {
             </div>
           </div> */}
         </div>
+
+        <h2 className="text-2xl font-bold text-center mb-3 text-[#c63018]">PisoGamePlus</h2>
         
         {/* Login Form */}
         {/* <div className="bg-white rounded-3xl shadow-xl overflow-hidden"> */}
