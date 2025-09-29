@@ -9,9 +9,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'BetMoto',
-        short_name: 'BetMoto',
-        description: 'BetMoto',
+        name: 'PisoGamePlus',
+        short_name: 'PisoGamePlus',
+        description: 'PisoGamePlus',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',

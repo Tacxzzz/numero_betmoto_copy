@@ -1,6 +1,6 @@
 {
-    "name": "BetMoto",
-    "short_name": "BetMoto",
+    "name": "PisoGamePlus",
+    "short_name": "PisoGamePlus",
     "start_url": "/",
     "display": "standalone",
     "theme_color": "#f0ba2c",
