@@ -185,22 +185,22 @@ const TicketReceipt: React.FC = () => {
 
             {/* Ticket Details */}
             <div className="w-full grid">
-              <div className="flex font-bold">
+              <div className="flex font-bold text-xl">
                   <span>{bet.bets}</span>
                 </div>
-                <div className="flex justify-between items-start w-full font-bold">
+                <div className="flex justify-between items-start w-full font-bold text-xl">
                   <span className="mr-2">Ticket Price:</span>
                   <span>{formatPeso(bet.bet)}</span>
                 </div>
-                <div className="font-bold">
+                <div className="font-bold text-xl">
                   {bet.created_date} {bet.created_time}
                 </div>
-                <div className="font-bold">{bet.game_type_name} {formatPeso(bet.bet)}</div>
+                <div className="font-bold text-xl">{bet.game_type_name} {formatPeso(bet.bet)}</div>
                 <div> </div>
-                <div className="font-bold">
+                <div className="font-bold text-xl">
                     {bet.draw_date} {bet.draw_time}
                 </div>
-                <div className="font-bold">
+                <div className="font-bold text-xl">
                     {bet.bakas_full_name}
                 </div>
               <div className="space-y-1">
