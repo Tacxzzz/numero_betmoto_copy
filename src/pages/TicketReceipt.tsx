@@ -167,7 +167,7 @@ const TicketReceipt: React.FC = () => {
         <Card ref={ticketRef} className="w-[365px] h-[430px] overflow-hidden">
           <CardContent className="p-6 flex flex-col items-center">
             {/* Logo */}
-            <div className="mb-6 mt-4">
+            <div className="mb-4 mt-4">
               {/* <div className="font-bold text-4xl text-center">
                 {bet.game_name}
                 <div className="text-xs font-bold bg-black text-white px-2 text-center">LOTTO</div>
